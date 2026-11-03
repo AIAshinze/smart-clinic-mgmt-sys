@@ -1,27 +1,74 @@
-
 package com.project.back_end.controllers;
 
+import com.project.back_end.DTO.Login;
+import com.project.back_end.models.Admin;
+import com.project.back_end.repo.AdminRepository;
+import com.project.back_end.services.ClinicException;
+import com.project.back_end.services.TokenService;
+import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/admin")
 public class AdminController {
+    private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
-// 1. Set Up the Controller Class:
-//    - Annotate the class with `@RestController` to indicate that it's a REST controller, used to handle web requests and return JSON responses.
-//    - Use `@RequestMapping("${api.path}admin")` to define a base path for all endpoints in this controller.
-//    - This allows the use of an external property (`api.path`) for flexible configuration of endpoint paths.
+    public AdminController(
+            AdminRepository adminRepository,
+            PasswordEncoder passwordEncoder,
+            TokenService tokenService) {
+        this.adminRepository = adminRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
+    }
 
+    @PostMapping("/login")
+    public Map<String, String> login(@Valid @RequestBody Login request) {
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            throw new ClinicException(HttpStatus.BAD_REQUEST, "Username is required");
+        }
+        Admin admin = adminRepository.findByUsernameIgnoreCase(request.getUsername().trim())
+                .orElseThrow(() -> new ClinicException(HttpStatus.UNAUTHORIZED, "Invalid username or password"));
+        if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
+            throw new ClinicException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
+        }
+        return Map.of("token", tokenService.generateToken(admin.getUsername(), "admin"), "role", "admin");
+    }
 
-// 2. Autowire Service Dependency:
-//    - Use constructor injection to autowire the `Service` class.
-//    - The service handles core logic related to admin validation and token checking.
-//    - This promotes cleaner code and separation of concerns between the controller and business logic layer.
+    @GetMapping
+    public List<Map<String, Object>> listAdmins(
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
+        tokenService.authenticate(authorization, "admin");
+        return adminRepository.findAll().stream()
+                .map(admin -> Map.<String, Object>of("id", admin.getId(), "username", admin.getUsername()))
+                .toList();
+    }
 
-
-// 3. Define the `adminLogin` Method:
-//    - Handles HTTP POST requests for admin login functionality.
-//    - Accepts an `Admin` object in the request body, which contains login credentials.
-//    - Delegates authentication logic to the `validateAdmin` method in the service layer.
-//    - Returns a `ResponseEntity` with a `Map` containing login status or messages.
-
-
-
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> createAdmin(
+            @RequestHeader(name = "Authorization", required = false) String authorization,
+            @Valid @RequestBody Admin admin) {
+        tokenService.authenticate(authorization, "admin");
+        if (adminRepository.findByUsernameIgnoreCase(admin.getUsername().trim()).isPresent()) {
+            throw new ClinicException(HttpStatus.CONFLICT, "An admin with this username already exists");
+        }
+        admin.setId(null);
+        admin.setUsername(admin.getUsername().trim());
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        Admin saved = adminRepository.save(admin);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("id", saved.getId(), "username", saved.getUsername()));
+    }
 }
-

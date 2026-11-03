@@ -1,19 +1,27 @@
-// appointmentRow.js
-export function getAppointments(appointment) {
-  const tr = document.createElement("tr");
-
-  tr.innerHTML = `
-      <td class="patient-id">${appointment.patientName}</td>
-      <td>${appointment.doctorName}</td>
-      <td>${appointment.date}</td>
-      <td>${appointment.time}</td>
-      <td><img src="../assets/images/edit/edit.png" alt="action" class="prescription-btn" data-id="${appointment.id}"></img></td>
-    `;
-
-  // Attach event listeners
-  tr.querySelector(".prescription-btn").addEventListener("click", () => {
-    window.location.href = `addPrescription.html?id=${patient.id}`;
+export function getAppointments(appointment, onPrescription) {
+  const row = document.createElement("tr");
+  const values = [
+    appointment.patientName,
+    appointment.doctorName,
+    new Date(appointment.appointmentTime).toLocaleDateString(),
+    new Date(appointment.appointmentTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  ];
+  values.forEach(value => {
+    const cell = document.createElement("td");
+    cell.textContent = value ?? "";
+    row.append(cell);
   });
-
-  return tr;
+  const actionCell = document.createElement("td");
+  if (appointment.status === 0 && onPrescription) {
+    const action = document.createElement("button");
+    action.type = "button";
+    action.className = "button button-primary";
+    action.textContent = "Add prescription";
+    action.addEventListener("click", () => onPrescription(appointment));
+    actionCell.append(action);
+  } else {
+    actionCell.textContent = appointment.status === 1 ? "Completed" : "";
+  }
+  row.append(actionCell);
+  return row;
 }

@@ -1,52 +1,93 @@
 package com.project.back_end.controllers;
 
+import com.project.back_end.DTO.Login;
+import com.project.back_end.DTO.PatientProfileUpdate;
+import com.project.back_end.models.Patient;
+import com.project.back_end.services.PatientService;
+import com.project.back_end.services.TokenService;
+import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/patients")
 public class PatientController {
+    private final PatientService patientService;
+    private final TokenService tokenService;
 
-// 1. Set Up the Controller Class:
-//    - Annotate the class with `@RestController` to define it as a REST API controller for patient-related operations.
-//    - Use `@RequestMapping("/patient")` to prefix all endpoints with `/patient`, grouping all patient functionalities under a common route.
+    public PatientController(PatientService patientService, TokenService tokenService) {
+        this.patientService = patientService;
+        this.tokenService = tokenService;
+    }
 
+    @PostMapping("/register")
+    public ResponseEntity<Patient> register(@Valid @RequestBody Patient patient) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientService.register(patient));
+    }
 
-// 2. Autowire Dependencies:
-//    - Inject `PatientService` to handle patient-specific logic such as creation, retrieval, and appointments.
-//    - Inject the shared `Service` class for tasks like token validation and login authentication.
+    @PostMapping("/login")
+    public Map<String, String> login(@Valid @RequestBody Login request) {
+        Patient patient = patientService.authenticate(request.getEmail(), request.getPassword());
+        return Map.of("token", tokenService.generateToken(patient.getEmail(), "patient"), "role", "patient");
+    }
 
+    @GetMapping("/me")
+    public Patient getProfile(@RequestHeader(name = "Authorization", required = false) String authorization) {
+        var claims = tokenService.authenticate(authorization, "patient");
+        return patientService.findByEmail(claims.getSubject());
+    }
 
-// 3. Define the `getPatient` Method:
-//    - Handles HTTP GET requests to retrieve patient details using a token.
-//    - Validates the token for the `"patient"` role using the shared service.
-//    - If the token is valid, returns patient information; otherwise, returns an appropriate error message.
+    @PatchMapping("/me")
+    public Patient updateProfile(
+            @RequestHeader(name = "Authorization", required = false) String authorization,
+            @Valid @RequestBody PatientProfileUpdate changes) {
+        var claims = tokenService.authenticate(authorization, "patient");
+        return patientService.updateProfile(
+                claims.getSubject(), changes.getName(), changes.getPhone(), changes.getAddress());
+    }
 
+    @GetMapping
+    public List<Patient> getPatients(
+            @RequestHeader(name = "Authorization", required = false) String authorization) {
+        tokenService.authenticate(authorization, "admin");
+        return patientService.findAll();
+    }
 
-// 4. Define the `createPatient` Method:
-//    - Handles HTTP POST requests for patient registration.
-//    - Accepts a validated `Patient` object in the request body.
-//    - First checks if the patient already exists using the shared service.
-//    - If validation passes, attempts to create the patient and returns success or error messages based on the outcome.
+    @GetMapping("/{id}")
+    public Patient getPatient(
+            @RequestHeader(name = "Authorization", required = false) String authorization,
+            @PathVariable Long id) {
+        tokenService.authenticate(authorization, "admin");
+        return patientService.findById(id);
+    }
 
+    @PutMapping("/{id}")
+    public Patient updatePatient(
+            @RequestHeader(name = "Authorization", required = false) String authorization,
+            @PathVariable Long id,
+            @Valid @RequestBody Patient patient) {
+        tokenService.authenticate(authorization, "admin");
+        return patientService.update(id, patient);
+    }
 
-// 5. Define the `login` Method:
-//    - Handles HTTP POST requests for patient login.
-//    - Accepts a `Login` DTO containing email/username and password.
-//    - Delegates authentication to the `validatePatientLogin` method in the shared service.
-//    - Returns a response with a token or an error message depending on login success.
-
-
-// 6. Define the `getPatientAppointment` Method:
-//    - Handles HTTP GET requests to fetch appointment details for a specific patient.
-//    - Requires the patient ID, token, and user role as path variables.
-//    - Validates the token using the shared service.
-//    - If valid, retrieves the patient's appointment data from `PatientService`; otherwise, returns a validation error.
-
-
-// 7. Define the `filterPatientAppointment` Method:
-//    - Handles HTTP GET requests to filter a patient's appointments based on specific conditions.
-//    - Accepts filtering parameters: `condition`, `name`, and a token.
-//    - Token must be valid for a `"patient"` role.
-//    - If valid, delegates filtering logic to the shared service and returns the filtered result.
-
-
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePatient(
+            @RequestHeader(name = "Authorization", required = false) String authorization,
+            @PathVariable Long id) {
+        tokenService.authenticate(authorization, "admin");
+        patientService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
-
-

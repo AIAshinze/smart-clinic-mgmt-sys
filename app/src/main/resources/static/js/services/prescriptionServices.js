@@ -1,46 +1,24 @@
-// prescriptionServices.js
-import { API_BASE_URL } from '../config/config.js'
+import { apiRequest, jsonBody } from "./api.js";
 
-const PRESCRITION_API = API_BASE_URL + "/prescription"
-export async function savePrescription(prescription, token) {
-  try {
-    const response = await fetch(`${PRESCRITION_API}/${token}`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json"
-      },
-      body: JSON.stringify(prescription)
-    });
-    const result = await response.json();
-    return { success: response.ok, message: result.message }
-  }
-  catch (error) {
-    console.error("Error :: savePrescription :: ", error)
-    return { success: false, message: result.message }
-  }
+export function savePrescription(prescription) {
+  return apiRequest("/api/prescriptions", { method: "POST", body: jsonBody(prescription) });
 }
 
-export async function getPrescription(appointmentId, token) {
-  try {
-    const response = await fetch(`${PRESCRITION_API}/${appointmentId}/${token}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+export function getPrescription(appointmentId) {
+  return apiRequest(`/api/prescriptions/appointment/${encodeURIComponent(appointmentId)}`);
+}
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Failed to fetch prescription:", errorData);
-      throw new Error(errorData.message || "Unable to fetch prescription");
-    }
+export function getMyPrescriptions() {
+  return apiRequest("/api/prescriptions/mine");
+}
 
-    const result = await response.json();
-    console.log(result)
-    console.log(result)
-    return result; // This should be your prescription object
-  } catch (error) {
-    console.error("Error :: getPrescription ::", error);
-    throw error;
-  }
+export function updatePrescription(id, prescription) {
+  return apiRequest(`/api/prescriptions/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    body: jsonBody(prescription)
+  });
+}
+
+export function deletePrescription(id) {
+  return apiRequest(`/api/prescriptions/${encodeURIComponent(id)}`, { method: "DELETE" });
 }

@@ -1,62 +1,34 @@
-// appointmentRecordService.js
-import { API_BASE_URL } from "../config/config.js";
-const APPOINTMENT_API = `${API_BASE_URL}/appointments`;
+import { apiRequest, jsonBody } from "./api.js";
 
-
-//This is for the doctor to get all the patient Appointments
-export async function getAllAppointments(date, patientName, token) {
-  const response = await fetch(`${APPOINTMENT_API}/${date}/${patientName}/${token}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch appointments");
-  }
-
-  return await response.json();
+export function bookAppointment(appointment) {
+  return apiRequest("/api/appointments", { method: "POST", body: jsonBody(appointment) });
 }
 
-export async function bookAppointment(appointment, token) {
-  try {
-    const response = await fetch(`${APPOINTMENT_API}/${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(appointment)
-    });
-
-    const data = await response.json();
-    return {
-      success: response.ok,
-      message: data.message || "Something went wrong"
-    };
-  } catch (error) {
-    console.error("Error while booking appointment:", error);
-    return {
-      success: false,
-      message: "Network error. Please try again later."
-    };
-  }
+export function updateAppointment(id, appointment) {
+  return apiRequest(`/api/appointments/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    body: jsonBody(appointment)
+  });
 }
 
-export async function updateAppointment(appointment, token) {
-  try {
-    const response = await fetch(`${APPOINTMENT_API}/${token}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(appointment)
-    });
+export function cancelAppointment(id) {
+  return apiRequest(`/api/appointments/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
 
-    const data = await response.json();
-    return {
-      success: response.ok,
-      message: data.message || "Something went wrong"
-    };
-  } catch (error) {
-    console.error("Error while booking appointment:", error);
-    return {
-      success: false,
-      message: "Network error. Please try again later."
-    };
-  }
+export function getPatientAppointments() {
+  return apiRequest("/api/appointments/mine");
+}
+
+export function getDoctorAppointments(date, patientName = "") {
+  const params = new URLSearchParams({ date });
+  if (patientName) params.set("patientName", patientName);
+  return apiRequest(`/api/appointments/doctor?${params}`);
+}
+
+export function getAllAppointments() {
+  return apiRequest("/api/appointments");
+}
+
+export function completeAppointment(id) {
+  return apiRequest(`/api/appointments/${encodeURIComponent(id)}/complete`, { method: "PATCH" });
 }

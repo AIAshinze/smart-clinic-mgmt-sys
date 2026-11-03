@@ -1,17 +1,24 @@
-// patientRecordRow.js
-export function createPatientRecordRow(patient) {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-      <td class="patient-id">${patient.appointmentDate}</td>
-      <td>${patient.id}</td>
-      <td>${patient.patientId}</td>
-      <td><img src="../assets/images/addPrescriptionIcon/addPrescription.png" alt="addPrescriptionIcon" class="prescription-btn" data-id="${patient.id}"></img></td>
-    `;
-
-  // Attach event listeners
-  tr.querySelector(".prescription-btn").addEventListener("click", () => {
-    window.location.href = `/pages/addPrescription.html?mode=view&appointmentId=${patient.id}`;
+export function createPatientRecordRow(appointment, onViewPrescription) {
+  const row = document.createElement("tr");
+  const values = [
+    new Date(appointment.appointmentTime).toLocaleDateString(),
+    appointment.id,
+    appointment.patientId
+  ];
+  values.forEach(value => {
+    const cell = document.createElement("td");
+    cell.textContent = value ?? "";
+    row.append(cell);
   });
-
-  return tr;
+  const actionCell = document.createElement("td");
+  if (onViewPrescription) {
+    const action = document.createElement("button");
+    action.type = "button";
+    action.className = "button button-outline";
+    action.textContent = "View prescription";
+    action.addEventListener("click", () => onViewPrescription(appointment));
+    actionCell.append(action);
+  }
+  row.append(actionCell);
+  return row;
 }
