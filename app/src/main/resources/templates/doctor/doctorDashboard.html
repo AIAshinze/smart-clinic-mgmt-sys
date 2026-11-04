@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,11 +8,13 @@
   <link rel="stylesheet" th:href="@{/assets/css/clinic.css}">
   <script type="module" th:src="@{/js/doctorDashboard.js}"></script>
 </head>
+
 <body th:attr="data-token=${authToken},data-role=${role}">
   <div class="page-shell">
     <header id="header" class="site-header">
       <a class="brand" th:href="@{/}">SmartCare</a>
-      <nav><a class="button button-outline" th:href="@{/}">Clinic portal</a><button id="logout" class="button button-quiet" type="button">Sign out</button></nav>
+      <nav><a class="button button-outline" th:href="@{/}">Clinic portal</a><button id="logout"
+          class="button button-quiet" type="button">Sign out</button></nav>
     </header>
     <main class="content-section">
       <p class="eyebrow">Doctor</p>
@@ -25,12 +28,23 @@
       <p id="page-message" class="status-message" role="status"></p>
       <div class="table-wrap">
         <table id="patientTable">
-          <thead><tr><th>Patient ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Visit</th><th>Action</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Visit</th>
+              <th>Action</th>
+            </tr>
+          </thead>
           <tbody id="patientTableBody"></tbody>
         </table>
       </div>
     </main>
-    <footer id="footer" class="site-footer"><p>Patient information is confidential. Access only records needed for care.</p></footer>
+    <footer id="footer" class="site-footer">
+      <p>Patient information is confidential. Access only records needed for care.</p>
+    </footer>
   </div>
   <dialog id="prescription-dialog" class="app-dialog">
     <button id="close-prescription" class="dialog-close" type="button" aria-label="Close">&times;</button>
@@ -43,4 +57,5 @@
     </form>
   </dialog>
 </body>
+
 </html>

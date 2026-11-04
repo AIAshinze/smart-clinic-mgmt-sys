@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 
 @org.springframework.stereotype.Service
 public class Service {
+
     private final TokenService tokenService;
 
     public Service(TokenService tokenService) {

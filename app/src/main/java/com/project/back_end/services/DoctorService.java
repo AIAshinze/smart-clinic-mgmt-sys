@@ -1,33 +1,36 @@
 package com.project.back_end.services;
 
-import com.project.back_end.models.Doctor;
-import com.project.back_end.repo.AppointmentRepository;
-import com.project.back_end.repo.DoctorRepository;
-import com.project.back_end.repo.PrescriptionRepository;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Doctor;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.DoctorRepository;
+
 @Service
 public class DoctorService {
+
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
-    private final PrescriptionRepository prescriptionRepository;
+    private final PrescriptionService prescriptionService;
     private final PasswordEncoder passwordEncoder;
 
     public DoctorService(
             DoctorRepository doctorRepository,
             AppointmentRepository appointmentRepository,
-            PrescriptionRepository prescriptionRepository,
+            PrescriptionService prescriptionService,
             PasswordEncoder passwordEncoder) {
         this.doctorRepository = doctorRepository;
         this.appointmentRepository = appointmentRepository;
-        this.prescriptionRepository = prescriptionRepository;
+        this.prescriptionService = prescriptionService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -112,10 +115,11 @@ public class DoctorService {
     @Transactional
     public void delete(Long id) {
         Doctor doctor = findById(id);
-        appointmentRepository.findByDoctorIdOrderByAppointmentTimeDesc(id)
-                .forEach(appointment -> prescriptionRepository.deleteByAppointmentId(appointment.getId()));
+        List<Long> appointmentIds = appointmentRepository.findByDoctorIdOrderByAppointmentTimeDesc(id)
+                .stream().map(Appointment::getId).toList();
         appointmentRepository.deleteByDoctorId(id);
         doctorRepository.delete(doctor);
+        prescriptionService.deleteForAppointmentsAfterCommit(appointmentIds);
     }
 
     @Transactional(readOnly = true)

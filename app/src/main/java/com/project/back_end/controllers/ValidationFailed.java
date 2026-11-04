@@ -1,9 +1,8 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.services.ClinicException;
-import jakarta.validation.ConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,8 +14,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.project.back_end.services.ClinicException;
+
+import jakarta.validation.ConstraintViolationException;
+
 @RestControllerAdvice
 public class ValidationFailed {
+
     private static final Logger logger = LoggerFactory.getLogger(ValidationFailed.class);
 
     @ExceptionHandler(ClinicException.class)
@@ -43,8 +47,11 @@ public class ValidationFailed {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleConflict(DataIntegrityViolationException exception) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", "The operation conflicts with existing clinic data"));
+        String cause = exception.getMostSpecificCause().getMessage();
+        String message = cause != null && cause.contains("uk_appointment_doctor_time")
+                ? "The selected appointment time is already booked"
+                : "The operation conflicts with existing clinic data";
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", message));
     }
 
     @ExceptionHandler(org.springframework.dao.DataAccessException.class)

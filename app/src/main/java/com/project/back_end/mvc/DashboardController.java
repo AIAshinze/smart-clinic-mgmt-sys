@@ -1,13 +1,15 @@
 package com.project.back_end.mvc;
 
-import com.project.back_end.services.Service;
-import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.project.back_end.services.Service;
+
 @Controller
 public class DashboardController {
+
     private final Service service;
 
     public DashboardController(Service service) {

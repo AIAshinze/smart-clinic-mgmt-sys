@@ -1,14 +1,9 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.DTO.Login;
-import com.project.back_end.models.Doctor;
-import com.project.back_end.services.ClinicException;
-import com.project.back_end.services.DoctorService;
-import com.project.back_end.services.TokenService;
-import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,9 +17,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.back_end.DTO.Login;
+import com.project.back_end.models.Doctor;
+import com.project.back_end.services.ClinicException;
+import com.project.back_end.services.DoctorService;
+import com.project.back_end.services.TokenService;
+
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/doctors")
 public class DoctorController {
+
     private final DoctorService doctorService;
     private final TokenService tokenService;
 

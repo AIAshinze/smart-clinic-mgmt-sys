@@ -1,65 +1,159 @@
-/* This is the style sheet for the doctorDashboard.html */
-/* 
-**Table Header (`.table-header`)**
-
-* Set font size to `24px` for clear emphasis.
-* Use a dark teal color (`#015c5d`) for consistency with the theme.
-* Add `30px` bottom margin and remove right margin.
-
-**Table Styling (`table`)**
-
-* Make the table full width (`100%`).
-* Collapse borders for clean lines.
-* Use a `sans-serif` font.
-* Add `20px` top margin for spacing.
-
-**Table Head (`thead`)**
-
-* Set a very light dark background (`#33333310`) for header row.
-* Use white text color (`#fff`).
-
-**Table Cells (`td, th`)**
-
-* Apply padding of `12px 16px` for spacing.
-* Center-align the text.
-* Add a subtle bottom border (`1px solid #ddd`).
-
-**Table Row Styling**
-
-* Alternate row colors for better readability:
-
-  * Even rows: semi-transparent light grey (`#f9f9f959`).
-  * Odd rows: soft white background (`#ffffffc0`).
-* On hover: highlight row with a light teal overlay (`#015c5d39`).
-
-**Prescription Button (`.prescription-btn`)**
-
-* Set size to `30px x 30px`.
-* Make it interactive with a pointer cursor.
-* Add transition effects for scale and brightness on hover.
-* On hover:
-
-  * Slightly enlarge (`scale(1.1)`)
-  * Brighten appearance
-* On click: slightly shrink (`scale(0.95)`).
-
-**No Record Message (`.noPatientRecord`)**
-
-* Use a `16px` italic grey font to indicate no data gently.
-
-**Today Button (`.today-btn`)**
-
-* Add right margin (`10px`).
-* Add padding (`10px`).
-* Set background color to teal green (`#015c5d`).
-
-**Date Picker (`.date-picker`)**
-
-* Add left margin (`10px`) and top margin (`13px`).
-* Round corners with `8px` radius.
-* Add padding (`10px`) and set fixed height (`30px`).
-
----
-
-Let me know if you'd like a consolidated style guide for the entire HospitalCRM frontend.
+/*
+ * doctorDashboard.css
+ * Styles for the doctor view. Every rule is scoped to .doctor-dashboard, the class
+ * that app.js adds to the workspace container while the doctor view is shown
+ * (see the hook note below).
+ *
+ * Hook: in renderDashboard() in app.js, replace the admin-only line with both:
+ *   workspaceView.classList.toggle("admin-dashboard", role === "admin");
+ *   workspaceView.classList.toggle("doctor-dashboard", role === "doctor");
  */
+
+.doctor-dashboard {
+  --doctor-accent: #015c5d;
+  --doctor-accent-dark: #003e3e;
+  --doctor-heading: #015c5d;
+  --doctor-header-bg: #e9efef;
+  --doctor-header-text: #143b3c;
+  --doctor-row-even: #f9f9f959;
+  --doctor-row-odd: #ffffffc0;
+  --doctor-row-hover: #015c5d39;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.doctor-dashboard *,
+.doctor-dashboard *::before,
+.doctor-dashboard *::after {
+  box-sizing: border-box;
+}
+
+/* Page title (the "table header" from the spec is the dashboard heading) */
+.doctor-dashboard .workspace-heading h2,
+.doctor-dashboard .table-header {
+  margin: 0 0 30px;
+  color: var(--doctor-heading);
+  font-size: 24px;
+}
+
+/* Tables: used for any tabular data in the doctor view */
+.doctor-dashboard table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  font-family: sans-serif;
+}
+
+.doctor-dashboard thead {
+  background-color: var(--doctor-header-bg);
+  color: var(--doctor-header-text);
+}
+
+.doctor-dashboard th,
+.doctor-dashboard td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.doctor-dashboard tbody tr:nth-child(even),
+.doctor-dashboard .appointment-list>.appointment-card:nth-child(even) {
+  background-color: var(--doctor-row-even);
+}
+
+.doctor-dashboard tbody tr:nth-child(odd),
+.doctor-dashboard .appointment-list>.appointment-card:nth-child(odd) {
+  background-color: var(--doctor-row-odd);
+}
+
+.doctor-dashboard tbody tr:hover,
+.doctor-dashboard .appointment-list>.appointment-card:hover {
+  background-color: var(--doctor-row-hover);
+}
+
+/* Appointment-card list: the view's equivalent of table rows */
+.doctor-dashboard .appointment-card {
+  border-radius: 12px;
+}
+
+/* Add-prescription icon button (uses the existing icon asset) */
+.doctor-dashboard .prescription-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: url("../images/addPrescriptionIcon/addPrescription.png") center / contain no-repeat transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.doctor-dashboard .prescription-btn:hover {
+  transform: scale(1.1);
+  filter: brightness(1.15);
+}
+
+.doctor-dashboard .prescription-btn:active {
+  transform: scale(0.95);
+}
+
+/* Empty-state message, e.g. "No appointments for this date." */
+.doctor-dashboard .noPatientRecord,
+.doctor-dashboard .appointment-list>.muted {
+  font-size: 16px;
+  font-style: italic;
+  color: #777777;
+}
+
+/* Today button (shortcut to the current date) */
+.doctor-dashboard .today-btn {
+  margin-right: 10px;
+  padding: 10px;
+  border: none;
+  background-color: var(--doctor-accent);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.doctor-dashboard .today-btn:hover {
+  background-color: var(--doctor-accent-dark);
+}
+
+/* Date picker: the "Appointment date" input in the controls form */
+.doctor-dashboard .date-picker,
+.doctor-dashboard input[type="date"] {
+  margin: 13px 0 0 10px;
+  padding: 10px;
+  border-radius: 8px;
+  min-height: 2.5rem;
+}
+
+/* Doctor primary actions ("Search", "Add prescription") */
+.doctor-dashboard .button-primary {
+  background-color: var(--doctor-accent);
+  border-color: transparent;
+}
+
+.doctor-dashboard .button-primary:hover {
+  background-color: var(--doctor-accent-dark);
+}
+
+/* Small screens */
+@media (max-width: 700px) {
+
+  .doctor-dashboard .workspace-heading h2,
+  .doctor-dashboard .table-header {
+    font-size: 20px;
+  }
+
+  .doctor-dashboard th,
+  .doctor-dashboard td {
+    padding: 8px 10px;
+  }
+
+  .doctor-dashboard .date-picker,
+  .doctor-dashboard input[type="date"] {
+    margin-left: 0;
+  }
+}

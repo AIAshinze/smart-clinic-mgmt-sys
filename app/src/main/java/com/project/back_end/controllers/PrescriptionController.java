@@ -1,12 +1,7 @@
 package com.project.back_end.controllers;
 
-import com.project.back_end.models.Prescription;
-import com.project.back_end.services.AppointmentService;
-import com.project.back_end.services.ClinicException;
-import com.project.back_end.services.PrescriptionService;
-import com.project.back_end.services.TokenService;
-import jakarta.validation.Valid;
 import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,9 +14,18 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.back_end.models.Prescription;
+import com.project.back_end.services.AppointmentService;
+import com.project.back_end.services.ClinicException;
+import com.project.back_end.services.PrescriptionService;
+import com.project.back_end.services.TokenService;
+
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/prescriptions")
 public class PrescriptionController {
+
     private final PrescriptionService prescriptionService;
     private final AppointmentService appointmentService;
     private final TokenService tokenService;
@@ -40,11 +44,7 @@ public class PrescriptionController {
             @RequestHeader(name = "Authorization", required = false) String authorization,
             @Valid @RequestBody Prescription prescription) {
         var claims = tokenService.authenticate(authorization, "doctor");
-        var appointment = appointmentService.findDetails(prescription.getAppointmentId());
-        requireAppointmentDoctor(appointment.getDoctorEmail(), claims.getSubject());
-        prescription.setPatientName(appointment.getPatientName());
-        Prescription saved = prescriptionService.save(prescription);
-        appointmentService.complete(appointment.getId(), claims.getSubject());
+        Prescription saved = prescriptionService.issue(prescription, claims.getSubject());
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 

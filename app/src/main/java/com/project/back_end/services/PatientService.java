@@ -1,31 +1,34 @@
 package com.project.back_end.services;
 
-import com.project.back_end.models.Patient;
-import com.project.back_end.repo.AppointmentRepository;
-import com.project.back_end.repo.PatientRepository;
-import com.project.back_end.repo.PrescriptionRepository;
 import java.util.List;
 import java.util.Locale;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Patient;
+import com.project.back_end.repo.AppointmentRepository;
+import com.project.back_end.repo.PatientRepository;
+
 @Service
 public class PatientService {
+
     private final PatientRepository patientRepository;
     private final AppointmentRepository appointmentRepository;
-    private final PrescriptionRepository prescriptionRepository;
+    private final PrescriptionService prescriptionService;
     private final PasswordEncoder passwordEncoder;
 
     public PatientService(
             PatientRepository patientRepository,
             AppointmentRepository appointmentRepository,
-            PrescriptionRepository prescriptionRepository,
+            PrescriptionService prescriptionService,
             PasswordEncoder passwordEncoder) {
         this.patientRepository = patientRepository;
         this.appointmentRepository = appointmentRepository;
-        this.prescriptionRepository = prescriptionRepository;
+        this.prescriptionService = prescriptionService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -38,6 +41,9 @@ public class PatientService {
         }
         if (patientRepository.existsByPhone(patient.getPhone())) {
             throw new ClinicException(HttpStatus.CONFLICT, "An account with this phone number already exists");
+        }
+        if (patient.getPassword() == null || patient.getPassword().isBlank()) {
+            throw new ClinicException(HttpStatus.BAD_REQUEST, "A password is required to register");
         }
         patient.setPassword(passwordEncoder.encode(patient.getPassword()));
         return patientRepository.save(patient);
@@ -105,10 +111,11 @@ public class PatientService {
     @Transactional
     public void delete(Long id) {
         Patient patient = findById(id);
-        appointmentRepository.findByPatientIdOrderByAppointmentTimeDesc(id)
-                .forEach(appointment -> prescriptionRepository.deleteByAppointmentId(appointment.getId()));
+        List<Long> appointmentIds = appointmentRepository.findByPatientIdOrderByAppointmentTimeDesc(id)
+                .stream().map(Appointment::getId).toList();
         appointmentRepository.deleteByPatientId(id);
         patientRepository.delete(patient);
+        prescriptionService.deleteForAppointmentsAfterCommit(appointmentIds);
     }
 
     private static String normalizeEmail(String email) {

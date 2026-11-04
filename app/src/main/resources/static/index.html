@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +11,7 @@
   <link rel="stylesheet" href="./assets/css/clinic.css">
   <script type="module" src="./js/app.js"></script>
 </head>
+
 <body>
   <div class="page-shell">
     <header id="header" class="site-header"></header>
@@ -33,10 +35,14 @@
           <label>Doctor name<input id="search-doctor" type="search" placeholder="Search by name"></label>
           <label>Availability
             <select id="filter-time">
-              <option value="">Any time</option><option value="AM">Morning</option><option value="PM">Afternoon</option>
+              <option value="">Any time</option>
+              <option value="AM">Morning</option>
+              <option value="PM">Afternoon</option>
             </select>
           </label>
-          <label>Specialty<select id="filter-specialty"><option value="">All specialties</option></select></label>
+          <label>Specialty<select id="filter-specialty">
+              <option value="">All specialties</option>
+            </select></label>
         </div>
         <p id="directory-message" class="status-message" role="status"></p>
         <div id="doctor-list" class="card-grid"></div>
@@ -55,4 +61,5 @@
   </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
+
 </html>
