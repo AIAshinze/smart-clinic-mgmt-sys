@@ -31,7 +31,8 @@ public class Patient {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Size(min = 8, max = 100)
+    @NotBlank
+    @Size(min = 6, max = 100)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String password;

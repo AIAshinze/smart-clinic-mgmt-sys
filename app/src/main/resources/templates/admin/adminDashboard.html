@@ -1,58 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SmartCare | Admin dashboard</title>
-  <link rel="stylesheet" th:href="@{/assets/css/clinic.css}">
-  <script type="module" th:src="@{/js/adminDashboard.js}"></script>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" th:href="@{/assets/css/adminDashboard.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/index.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+  <script th:src="@{/js/render.js}" defer></script>
+  <script th:src="@{/js/util.js}" defer></script>
+  <script th:src="@{/js/components/header.js}" defer></script>
+  <script th:src="@{/js/components/footer.js}" defer></script>
 </head>
 
-<body th:attr="data-token=${authToken},data-role=${role}">
-  <div class="page-shell">
-    <header id="header" class="site-header">
-      <a class="brand" th:href="@{/}">SmartCare</a>
-      <nav><a class="button button-outline" th:href="@{/}">Clinic portal</a><button id="logout"
-          class="button button-quiet" type="button">Sign out</button></nav>
-    </header>
-    <main class="content-section">
-      <p class="eyebrow">Administrator</p>
-      <h1>Doctor directory</h1>
-      <p class="muted">Manage clinic providers and their appointment availability.</p>
-      <div class="filters">
-        <label>Search doctors<input id="searchBar" type="search" placeholder="Search by name"></label>
-        <label>Time<select id="filterTime">
-            <option value="">Any time</option>
+<body th:attr="data-token=${authToken},data-role=${role}" onload="renderContent()">
+  <div class="container">
+    <div class="wrapper">
+      <div id="header" class="header"></div>
+      <main class="main-content admin-dashboard">
+        <h2>Manage Doctors</h2>
+        <input class="input-field" type="text" id="searchBar" placeholder="search by doctor name">
+        <div class="filter-wrapper">
+          <select class="select-dropdown" id="filterTime" aria-label="Filter by availability time">
+            <option value="">All times</option>
             <option value="AM">Morning</option>
             <option value="PM">Afternoon</option>
-          </select></label>
-        <label>Specialty<select id="filterSpecialty">
+          </select>
+          <select class="select-dropdown" id="filterSpecialty" aria-label="Filter by specialty">
             <option value="">All specialties</option>
-          </select></label>
-      </div>
-      <button id="open-add-doctor" class="button button-primary" type="button">Add doctor</button>
-      <p id="page-message" class="status-message" role="status"></p>
-      <div id="content" class="card-grid"></div>
-    </main>
-    <footer id="footer" class="site-footer">
-      <p>SmartCare clinic administration</p>
-    </footer>
+          </select>
+        </div>
+        <p id="page-message" role="status"></p>
+        <div id="content" class="card-grid"></div>
+      </main>
+      <div id="footer"></div>
+    </div>
   </div>
-  <dialog id="add-doctor-dialog" class="app-dialog">
-    <button id="close-add-doctor" class="dialog-close" type="button" aria-label="Close">&times;</button>
-    <form id="add-doctor-form" class="dialog-form">
-      <h2>Add a doctor</h2>
-      <label>Name<input name="name" required minlength="3" maxlength="100"></label>
-      <label>Specialty<input name="specialty" required minlength="3" maxlength="50"></label>
-      <label>Email<input name="email" type="email" required></label>
-      <label>Phone (10 digits)<input name="phone" inputmode="numeric" pattern="[0-9]{10}" required></label>
-      <label>Initial password<input name="password" type="password" minlength="8" required></label>
-      <label>Availability (comma-separated HH:mm-HH:mm)<input name="availableTimes"
-          placeholder="09:00-10:00,14:00-15:00"></label>
-      <button class="button button-primary" type="submit">Save doctor</button>
-    </form>
-  </dialog>
+  <div id="modal" class="modal" aria-hidden="true">
+    <span id="closeModal" class="close" role="button" tabindex="0" aria-label="Close">&times;</span>
+    <div id="modal-body"></div>
+  </div>
+  <script type="module" th:src="@{/js/adminDashboard.js}" defer></script>
+  <script type="module" th:src="@{/js/components/doctorCard.js}" defer></script>
 </body>
 
 </html>

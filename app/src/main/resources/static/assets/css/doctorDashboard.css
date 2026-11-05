@@ -1,12 +1,5 @@
 /*
- * doctorDashboard.css
- * Styles for the doctor view. Every rule is scoped to .doctor-dashboard, the class
- * that app.js adds to the workspace container while the doctor view is shown
- * (see the hook note below).
- *
- * Hook: in renderDashboard() in app.js, replace the admin-only line with both:
- *   workspaceView.classList.toggle("admin-dashboard", role === "admin");
- *   workspaceView.classList.toggle("doctor-dashboard", role === "doctor");
+ * Styles for the doctor dashboard, scoped to .doctor-dashboard.
  */
 
 .doctor-dashboard {

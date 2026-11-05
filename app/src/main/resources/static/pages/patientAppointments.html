@@ -1,19 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SmartCare</title>
+  <title>Patient Appointments</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/patientDashboard.css">
+  <link rel="stylesheet" href="../assets/css/updateAppointment.css">
+  <script src="../js/render.js" defer></script>
+  <script src="../js/util.js" defer></script>
+  <script src="../js/components/header.js" defer></script>
+  <script src="../js/components/footer.js" defer></script>
 </head>
 
-<body>
-  <main>
-    <h1>Appointments moved</h1>
-    <p>View and manage your appointments from the SmartCare patient dashboard.</p>
-    <a href="/">Open SmartCare</a>
-  </main>
-  <script>window.location.replace("/");</script>
+<body onload="renderContent()">
+  <div class="container">
+    <div class="wrapper">
+      <div id="header" class="header"></div>
+      <main class="main-content">
+        <h2>My Appointments</h2>
+        <p id="page-message" role="status"></p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Doctor</th>
+                <th>Appointment time</th>
+                <th>Status</th>
+                <th>Prescription</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="appointmentTableBody"></tbody>
+          </table>
+        </div>
+      </main>
+      <div id="footer"></div>
+    </div>
+  </div>
+  <dialog id="prescription-details">
+    <button id="close-prescription-details" type="button">Close</button>
+    <pre id="prescription-content"></pre>
+  </dialog>
+  <dialog id="update-appointment-dialog">
+    <button id="close-update-appointment" type="button">Close</button>
+    <form id="reschedule-form">
+      <h2>Reschedule appointment</h2>
+      <label>Date<input id="reschedule-date" type="date" required></label>
+      <label>Available time<select id="reschedule-time" required></select></label>
+      <p id="reschedule-message" role="status"></p>
+      <button id="save-rescheduled-appointment" type="submit" disabled>Save appointment</button>
+    </form>
+  </dialog>
+  <script type="module" src="../js/patientAppointment.js" defer></script>
 </body>
 
 </html>

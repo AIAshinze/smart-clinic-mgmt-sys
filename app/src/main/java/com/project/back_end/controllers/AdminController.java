@@ -38,7 +38,7 @@ public class AdminController {
         this.tokenService = tokenService;
     }
 
-    @PostMapping("/login")
+    @PostMapping
     public Map<String, String> login(@Valid @RequestBody Login request) {
         if (request.getUsername() == null || request.getUsername().isBlank()) {
             throw new ClinicException(HttpStatus.BAD_REQUEST, "Username is required");
@@ -60,7 +60,7 @@ public class AdminController {
                 .toList();
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createAdmin(
             @RequestHeader(name = "Authorization", required = false) String authorization,
             @Valid @RequestBody Admin admin) {

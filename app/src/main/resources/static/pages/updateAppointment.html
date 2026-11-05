@@ -10,10 +10,17 @@
 <body>
   <main>
     <h1>Appointment management moved</h1>
-    <p>Update or cancel your scheduled visits from the SmartCare patient dashboard.</p>
-    <a href="/">Open SmartCare</a>
+    <p>Update or cancel your scheduled visits from your appointments page.</p>
+    <a href="/pages/patientAppointments.html">Open my appointments</a>
   </main>
-  <script>window.location.replace("/");</script>
+  <script>
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("userRole");
+    const destination = token && role === "loggedPatient"
+      ? "/pages/patientAppointments.html"
+      : role === "patient" ? "/pages/patientDashboard.html" : "/";
+    window.location.replace(destination);
+  </script>
 </body>
 
 </html>

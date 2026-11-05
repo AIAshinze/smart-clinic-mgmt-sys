@@ -23,7 +23,7 @@ import com.project.back_end.services.TokenService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/prescriptions")
+@RequestMapping("/api/prescription")
 public class PrescriptionController {
 
     private final PrescriptionService prescriptionService;

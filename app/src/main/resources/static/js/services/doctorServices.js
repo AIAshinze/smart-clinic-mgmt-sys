@@ -1,31 +1,63 @@
+import { API_BASE_URL } from "../config/config.js";
 import { apiRequest, jsonBody } from "./api.js";
 
-export function getDoctors(filters = {}) {
+const DOCTOR_API = `${API_BASE_URL}/doctor`;
+
+export async function getDoctors(filters = {}) {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(filters)) {
     if (value) params.set(key, value);
   }
   const query = params.size ? `?${params}` : "";
-  return apiRequest(`/api/doctors${query}`);
+  try {
+    return await apiRequest(`${DOCTOR_API}${query}`);
+  } catch (error) {
+    console.error("Unable to load doctors:", error);
+    return [];
+  }
+}
+
+export function filterDoctors(name = "", time = "", specialty = "") {
+  return getDoctors({ name, time, specialty });
 }
 
 export function getDoctorAvailability(id, date) {
-  return apiRequest(`/api/doctors/${encodeURIComponent(id)}/availability?date=${encodeURIComponent(date)}`);
+  return apiRequest(`${DOCTOR_API}/${encodeURIComponent(id)}/availability?date=${encodeURIComponent(date)}`);
 }
 
-export function createDoctor(doctor) {
-  return apiRequest("/api/doctors", { method: "POST", body: jsonBody(doctor) });
+export function saveDoctor(doctor, token = localStorage.getItem("token")) {
+  return apiRequest(DOCTOR_API, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: jsonBody(doctor)
+  }).then(data => ({ success: true, message: data?.message || "Doctor saved successfully.", data }))
+    .catch(error => {
+      console.error("Unable to save doctor:", error);
+      return { success: false, message: error.message };
+    });
 }
 
-export function updateDoctor(id, doctor) {
-  return apiRequest(`/api/doctors/${encodeURIComponent(id)}`, {
+export function createDoctor(doctor, token) {
+  return saveDoctor(doctor, token);
+}
+
+export function updateDoctor(id, doctor, token) {
+  return apiRequest(`${DOCTOR_API}/${encodeURIComponent(id)}`, {
     method: "PUT",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: jsonBody(doctor)
   });
 }
 
-export function deleteDoctor(id) {
-  return apiRequest(`/api/doctors/${encodeURIComponent(id)}`, { method: "DELETE" });
+export function deleteDoctor(id, token = localStorage.getItem("token")) {
+  return apiRequest(`${DOCTOR_API}/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then(() => ({ success: true, message: "Doctor deleted successfully." }))
+    .catch(error => {
+      console.error("Unable to delete doctor:", error);
+      return { success: false, message: error.message };
+    });
 }
 
 export async function getSpecialties() {

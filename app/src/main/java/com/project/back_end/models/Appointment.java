@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,15 +13,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "appointment", uniqueConstraints = @UniqueConstraint(
-        name = "uk_appointment_doctor_time", columnNames = {"doctor_id", "appointment_time"}))
+@Table(name = "appointment")
 public class Appointment {
 
     public static final int SCHEDULED = 0;
@@ -44,6 +43,7 @@ public class Appointment {
 
     @Min(0)
     @Max(1)
+    @Column(nullable = false)
     private int status = SCHEDULED;
 
     public Appointment() {

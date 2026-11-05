@@ -1,98 +1,497 @@
-/*
- * index.css
- * Styles for the landing page (index.html). Rules are scoped to .page-shell and
- * #home-view so they only affect the landing page; clinic.css supplies the base styles.
- * The workspace (dashboards) is inside .page-shell, so button rules here target only
- * the home view and the .dashboard-btn class to avoid restyling dashboard controls.
- */
-
-html,
-body {
-  height: 100%;
+:root {
+  color-scheme: light;
+  --ink: #143b3c;
+  --muted: #587071;
+  --brand: #0d6b66;
+  --brand-dark: #084d4a;
+  --surface: #ffffff;
+  --canvas: #f3f8f7;
+  --border: #d7e4e2;
+  --danger: #a52c36;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
 }
 
-.page-shell {
-  --landing-heading: #003e3e;
-  --landing-accent: #015c5d;
-  --landing-accent-hover: #A62B1F;
-  --landing-accent-dark: #003e3e;
-
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Roboto', Arial, sans-serif;
-  background-image: url("../images/defineRole/index.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-.page-shell *,
-.page-shell *::before,
-.page-shell *::after {
+* {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-/* Headings */
-.page-shell h2 {
-  margin: 0 0 1rem;
-  color: var(--landing-heading);
-  font-family: 'Alegreya', 'Roboto', sans-serif;
-  font-size: 48px;
-  font-weight: bold;
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  line-height: 1.55;
+  font-family: Roboto, Arial, sans-serif;
 }
 
-/* Main content block: the home view holds the doctor directory */
-#home-view {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  padding: 40px;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.88);
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
-#home-view .section-heading {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-/* Buttons: the home view's primary action and the shared .dashboard-btn */
-#home-view .button-primary,
-.dashboard-btn {
-  width: 200px;
-  margin-top: 10px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  background-color: var(--landing-accent);
-  color: #ffffff;
-  font-size: 16px;
+button {
   cursor: pointer;
 }
 
-#home-view .button-primary:hover {
-  background-color: var(--landing-accent-hover);
+[hidden] {
+  display: none !important;
 }
 
-.dashboard-btn:hover {
-  background-color: var(--landing-accent-dark);
+.page-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Small screens */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: .8rem max(1.25rem, calc((100% - 1120px) / 2));
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  color: var(--brand-dark);
+  font-size: 1.35rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.site-header nav {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.hero {
+  padding: clamp(3rem, 8vw, 6rem) max(1.25rem, calc((100% - 1120px) / 2));
+  color: white;
+  background: linear-gradient(115deg, #084d4a, #0d8178);
+}
+
+.hero h1 {
+  max-width: 720px;
+  margin: .25rem 0 1rem;
+  font-size: clamp(2.2rem, 6vw, 4.3rem);
+  line-height: 1.08;
+}
+
+.hero p:not(.eyebrow) {
+  max-width: 620px;
+  color: #e4f4f2;
+  font-size: 1.1rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #58bcb2;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.hero .eyebrow {
+  color: #9de0d9;
+}
+
+.content-section {
+  width: min(1120px, calc(100% - 2.5rem));
+  margin: 2.7rem auto;
+  flex: 1;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+h2 {
+  margin: .2rem 0;
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+}
+
+.muted,
+.section-heading>p {
+  color: var(--muted);
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1rem;
+  margin: 1.4rem 0;
+}
+
+label {
+  display: grid;
+  gap: .35rem;
+  color: var(--muted);
+  font-size: .9rem;
+  font-weight: 650;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: .65rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: .55rem;
+  background: white;
+  color: var(--ink);
+}
+
+textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: 3px solid #78c9c1;
+  outline-offset: 2px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.65rem;
+  padding: .55rem 1rem;
+  border: 1px solid transparent;
+  border-radius: .55rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.button-primary {
+  background: var(--brand);
+  color: white;
+}
+
+.button-primary:hover {
+  background: var(--brand-dark);
+}
+
+.button-light {
+  margin-top: .8rem;
+  background: white;
+  color: var(--brand-dark);
+}
+
+.button-light:hover {
+  background: #e6f4f2;
+}
+
+.button-outline {
+  border-color: var(--border);
+  background: white;
+  color: var(--ink);
+}
+
+.button-quiet {
+  background: transparent;
+  color: var(--ink);
+}
+
+.button-danger {
+  background: #fff0f0;
+  border-color: #f1c7ca;
+  color: var(--danger);
+}
+
+.button-danger:hover {
+  background: #ffe1e3;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+  gap: 1rem;
+}
+
+.doctor-card,
+.panel,
+.appointment-card {
+  padding: 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: .85rem;
+  background: var(--surface);
+  box-shadow: 0 4px 16px #173f3c0b;
+}
+
+.doctor-card h3 {
+  margin: 0 0 .25rem;
+}
+
+.doctor-card p {
+  margin: .45rem 0;
+  overflow-wrap: anywhere;
+}
+
+.card-actions {
+  margin-top: 1rem;
+}
+
+.status-message {
+  min-height: 1.5rem;
+  color: var(--muted);
+}
+
+.status-message.error {
+  color: var(--danger);
+}
+
+.workspace {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: #eaf3f1;
+}
+
+.workspace-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, .8fr) minmax(0, 1.6fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.panel h3 {
+  margin-top: 0;
+}
+
+.stack {
+  display: grid;
+  gap: .75rem;
+}
+
+.inline-form {
+  display: flex;
+  gap: .5rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.inline-form label {
+  flex: 1 1 180px;
+}
+
+.appointment-list {
+  display: grid;
+  gap: .7rem;
+}
+
+.appointment-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.appointment-card p {
+  margin: .2rem 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th,
+td {
+  padding: .7rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+.site-footer {
+  margin-top: auto;
+  padding: 1.5rem max(1.25rem, calc((100% - 1120px) / 2));
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  background: white;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.app-dialog {
+  width: min(520px, calc(100% - 2rem));
+  max-height: 90vh;
+  overflow: auto;
+  padding: 1.5rem;
+  border: 0;
+  border-radius: 1rem;
+  color: var(--ink);
+  box-shadow: 0 18px 70px #102e2c55;
+}
+
+.app-dialog::backdrop {
+  background: #082c2a99;
+}
+
+.dialog-close {
+  float: right;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.dialog-form {
+  display: grid;
+  gap: .8rem;
+  clear: both;
+}
+
+.dialog-form h2 {
+  margin: .5rem 0;
+}
+
+.toast {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 3;
+  max-width: min(420px, calc(100% - 2rem));
+  padding: .8rem 1rem;
+  border-radius: .6rem;
+  background: var(--brand-dark);
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(1rem);
+  transition: .2s ease;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: var(--danger);
+}
+
 @media (max-width: 700px) {
-  .page-shell h2 {
-    font-size: 32px;
+  .site-header {
+    align-items: flex-start;
   }
 
-  #home-view {
-    padding: 1.25rem;
+  .site-header nav {
+    flex-wrap: wrap;
+    justify-content: end;
   }
 
-  #home-view .button-primary,
-  .dashboard-btn {
-    width: 100%;
+  .filters,
+  .workspace-grid {
+    grid-template-columns: 1fr;
   }
+
+  .section-heading,
+  .workspace-heading,
+  .appointment-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .workspace {
+    padding: 1rem;
+  }
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+.container,
+.wrapper {
+  min-height: 100vh;
+}
+
+.container {
+  width: min(1120px, calc(100% - 2.5rem));
+  margin: 0 auto;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.role-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.home-page .main-content {
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  background-image: url("../images/defineRole/index.png");
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  text-align: center;
+}
+
+.home-page .main-content h2 {
+  color: var(--brand-dark);
+  font-weight: 800;
+}
+
+.home-page .role-options button {
+  min-width: 130px;
+  padding: .8rem 1.2rem;
+  border: 0;
+  border-radius: .6rem;
+  background: var(--brand);
+  color: white;
+}
+
+.home-page .role-options button:hover {
+  background: var(--brand-dark);
 }

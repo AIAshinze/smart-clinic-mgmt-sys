@@ -26,7 +26,7 @@ import com.project.back_end.services.TokenService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/doctors")
+@RequestMapping("/api/doctor")
 public class DoctorController {
 
     private final DoctorService doctorService;

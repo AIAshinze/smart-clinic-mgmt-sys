@@ -1,61 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SmartCare | Doctor dashboard</title>
-  <link rel="stylesheet" th:href="@{/assets/css/clinic.css}">
-  <script type="module" th:src="@{/js/doctorDashboard.js}"></script>
+  <title>Doctor Dashboard</title>
+  <link rel="stylesheet" th:href="@{/assets/css/adminDashboard.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/doctorDashboard.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/index.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+  <script th:src="@{/js/render.js}" defer></script>
+  <script th:src="@{/js/util.js}" defer></script>
+  <script th:src="@{/js/components/header.js}" defer></script>
+  <script th:src="@{/js/components/footer.js}" defer></script>
 </head>
 
-<body th:attr="data-token=${authToken},data-role=${role}">
-  <div class="page-shell">
-    <header id="header" class="site-header">
-      <a class="brand" th:href="@{/}">SmartCare</a>
-      <nav><a class="button button-outline" th:href="@{/}">Clinic portal</a><button id="logout"
-          class="button button-quiet" type="button">Sign out</button></nav>
-    </header>
-    <main class="content-section">
-      <p class="eyebrow">Doctor</p>
-      <h1>Appointments</h1>
-      <p class="muted">Review your patient visits and document prescriptions.</p>
-      <form id="appointment-filter" class="inline-form">
-        <label>Date<input id="datePicker" name="date" type="date" required></label>
-        <label>Patient name<input id="searchBar" name="patientName" type="search"></label>
-        <button class="button button-primary" type="submit">Search</button>
-      </form>
-      <p id="page-message" class="status-message" role="status"></p>
-      <div class="table-wrap">
-        <table id="patientTable">
-          <thead>
-            <tr>
-              <th>Patient ID</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Visit</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="patientTableBody"></tbody>
-        </table>
-      </div>
-    </main>
-    <footer id="footer" class="site-footer">
-      <p>Patient information is confidential. Access only records needed for care.</p>
-    </footer>
+<body th:attr="data-token=${authToken},data-role=${role}" onload="renderContent()">
+  <div class="container">
+    <div class="wrapper">
+      <div id="header" class="header"></div>
+      <main class="main-content doctor-dashboard">
+        <h2>Patient Appointments</h2>
+        <div class="filter-wrapper">
+          <button id="todayButton" class="today-btn" type="button">Today's Appointments</button>
+          <input id="datePicker" class="date-picker input-field" type="date" aria-label="Appointment date">
+          <input id="searchBar" class="input-field" type="text" placeholder="Search by patient name"
+            aria-label="Search patients">
+        </div>
+        <p id="page-message" role="status"></p>
+        <div class="table-wrap">
+          <table id="patientTable">
+            <thead>
+              <tr>
+                <th>Patient ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Appointment</th>
+                <th>Prescription</th>
+              </tr>
+            </thead>
+            <tbody id="patientTableBody"></tbody>
+          </table>
+        </div>
+      </main>
+      <div id="footer"></div>
+    </div>
   </div>
-  <dialog id="prescription-dialog" class="app-dialog">
-    <button id="close-prescription" class="dialog-close" type="button" aria-label="Close">&times;</button>
-    <form id="prescription-form" class="dialog-form">
-      <h2 id="prescription-title">New prescription</h2>
-      <label>Medication<input name="medication" required minlength="3" maxlength="100"></label>
-      <label>Dosage<input name="dosage" required minlength="3" maxlength="20"></label>
-      <label>Doctor notes<textarea name="doctorNotes" maxlength="200"></textarea></label>
-      <button class="button button-primary" type="submit">Save prescription</button>
-    </form>
-  </dialog>
+  <div id="modal" class="modal" aria-hidden="true">
+    <span id="closeModal" class="close" role="button" tabindex="0" aria-label="Close">&times;</span>
+    <div id="modal-body"></div>
+  </div>
+  <script type="module" th:src="@{/js/components/patientRows.js}" defer></script>
+  <script type="module" th:src="@{/js/services/patientServices.js}" defer></script>
+  <script type="module" th:src="@{/js/doctorDashboard.js}" defer></script>
 </body>
 
 </html>

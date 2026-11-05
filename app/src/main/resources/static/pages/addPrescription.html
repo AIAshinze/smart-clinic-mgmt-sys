@@ -10,10 +10,18 @@
 <body>
   <main>
     <h1>Prescription workspace moved</h1>
-    <p>Sign in to your doctor account in the SmartCare portal to manage prescriptions.</p>
+    <p>Sign in as a doctor to manage prescriptions from the SmartCare dashboard.</p>
     <a href="/">Open SmartCare</a>
   </main>
-  <script>window.location.replace("/");</script>
+  <script>
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("userRole");
+    if (token && role === "doctor") {
+      window.location.replace(`/doctorDashboard/${encodeURIComponent(token)}`);
+    } else {
+      window.location.replace("/");
+    }
+  </script>
 </body>
 
 </html>

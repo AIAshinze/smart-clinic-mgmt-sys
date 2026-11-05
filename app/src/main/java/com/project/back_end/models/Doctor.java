@@ -43,7 +43,8 @@ public class Doctor {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Size(min = 8, max = 100)
+    @Size(min = 6, max = 100)
+    @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String password;

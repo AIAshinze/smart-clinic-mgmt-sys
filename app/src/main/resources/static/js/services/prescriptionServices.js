@@ -1,24 +1,27 @@
 import { apiRequest, jsonBody } from "./api.js";
+import { API_BASE_URL } from "../config/config.js";
+
+const PRESCRIPTION_API = `${API_BASE_URL}/prescription`;
 
 export function savePrescription(prescription) {
-  return apiRequest("/api/prescriptions", { method: "POST", body: jsonBody(prescription) });
+  return apiRequest(PRESCRIPTION_API, { method: "POST", body: jsonBody(prescription) });
 }
 
 export function getPrescription(appointmentId) {
-  return apiRequest(`/api/prescriptions/appointment/${encodeURIComponent(appointmentId)}`);
+  return apiRequest(`${PRESCRIPTION_API}/appointment/${encodeURIComponent(appointmentId)}`);
 }
 
 export function getMyPrescriptions() {
-  return apiRequest("/api/prescriptions/mine");
+  return apiRequest(`${PRESCRIPTION_API}/mine`);
 }
 
 export function updatePrescription(id, prescription) {
-  return apiRequest(`/api/prescriptions/${encodeURIComponent(id)}`, {
+  return apiRequest(`${PRESCRIPTION_API}/${encodeURIComponent(id)}`, {
     method: "PUT",
     body: jsonBody(prescription)
   });
 }
 
 export function deletePrescription(id) {
-  return apiRequest(`/api/prescriptions/${encodeURIComponent(id)}`, { method: "DELETE" });
+  return apiRequest(`${PRESCRIPTION_API}/${encodeURIComponent(id)}`, { method: "DELETE" });
 }

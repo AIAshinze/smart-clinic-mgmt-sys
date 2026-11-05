@@ -1,11 +1,5 @@
 /*
- * adminDashboard.css
- * Styles for the administrator view. Every admin rule is scoped to .admin-dashboard,
- * so doctor and patient views (styled by clinic.css) are not affected.
- *
- * Hook: app.js must add this class to the workspace container while the admin view
- * is shown, e.g. at the top of renderAdminDashboard():
- *   workspaceView.classList.add("admin-dashboard");
+ * Styles for the administrator dashboard, scoped to .admin-dashboard.
  */
 
 html,
@@ -89,6 +83,21 @@ body {
   color: var(--admin-secondary-text);
   font-weight: bold;
   cursor: pointer;
+}
+
+.adminBtn {
+  min-width: 110px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--admin-secondary-bg, #f4f4f4);
+  color: var(--admin-secondary-text, #333333);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.adminBtn:hover {
+  color: var(--admin-accent, #A62B1F);
 }
 
 .admin-dashboard .adminBtn:hover,
