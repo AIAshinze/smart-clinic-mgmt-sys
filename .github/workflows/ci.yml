@@ -19,4 +19,4 @@ jobs:
           java-version: "17"
           cache: maven
       - name: Verify application
-        run: ./mvnw -B -f app/pom.xml verify
+        run: ./app/mvnw -B -f app/pom.xml verify
