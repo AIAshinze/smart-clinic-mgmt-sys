@@ -5,7 +5,7 @@ SmartCare is a responsive clinic portal backed by a Spring Boot REST API. It use
 ## Roles, user stories, and access
 
 | Role | User stories | Permissions and restrictions |
-|---|---|---|
+| --- | --- | --- |
 | Admin | As an administrator, I can sign in, create other admin accounts, manage the doctor directory, inspect patient accounts, and review clinic appointments. | May create/read/update/delete doctors and patients, create/list admins, and read appointments. Cannot issue prescriptions or change another account's credentials through a public endpoint. |
 | Doctor | As a doctor, I can sign in, see my daily appointments and patient details, and record treatment after a visit. | May view only assigned appointments and patient prescriptions, mark their own appointments complete by prescribing, and create/update/delete prescriptions for their own appointments. Cannot manage users, other doctors, or patient bookings. |
 | Patient | As a patient, I can create an account, maintain my contact profile, find doctors, book/reschedule/cancel visits, and review my appointment and prescription history. | May access and update only their own profile and records. May change or cancel only their own scheduled appointments. Cannot view other patients or create prescriptions. |
@@ -25,12 +25,12 @@ Public doctor discovery exposes directory details only. Every protected API requ
 All routes are rooted at `/api`. Protected routes require a bearer token.
 
 | Resource | Endpoints | Access |
-|---|---|---|
-| Admin | `POST /admin/login`, `GET /admin`, `POST /admin` | Login is public; list/create require admin |
-| Doctors | `GET /doctors`, `GET /doctors/{id}`, `GET /doctors/{id}/availability?date=YYYY-MM-DD`, `POST /doctors/login`, `POST /doctors`, `PUT /doctors/{id}`, `DELETE /doctors/{id}` | Discovery and login are public; mutations require admin |
-| Patients | `POST /patients/register`, `POST /patients/login`, `GET/PATCH /patients/me`, `GET /patients`, `GET/PUT/DELETE /patients/{id}` | Register/login are public; self routes require patient; account administration requires admin |
-| Appointments | `GET /appointments/mine`, `POST /appointments`, `PUT/DELETE /appointments/{id}`, `GET /appointments/doctor?date=YYYY-MM-DD`, `PATCH /appointments/{id}/complete`, `GET /appointments` | Patients manage their own visits; doctors see/complete their own; admin can list all |
-| Prescriptions | `POST /prescriptions`, `GET /prescriptions/mine`, `GET /prescriptions/appointment/{appointmentId}`, `PUT/DELETE /prescriptions/{id}` | Doctors manage their own; patients read their own; admin may read |
+| --- | --- | --- |
+| Admin | `POST /admin`, `GET /admin`, `POST /admin/create` | Login is public; list/create require admin |
+| Doctors | `GET /doctor`, `GET /doctor/{id}`, `GET /doctor/{id}/availability?date=YYYY-MM-DD`, `POST /doctor/login`, `POST /doctor`, `PUT /doctor/{id}`, `DELETE /doctor/{id}` | Discovery and login are public; mutations require admin |
+| Patients | `POST /patient/register`, `POST /patient/login`, `GET/PATCH /patient/me`, `GET /patient`, `GET/PUT/DELETE /patient/{id}` | Register/login are public; self routes require patient; account administration requires admin |
+| Appointments | `GET /appointment/mine`, `POST /appointment`, `PUT/DELETE /appointment/{id}`, `GET /appointment/doctor?date=YYYY-MM-DD`, `PATCH /appointment/{id}/complete`, `GET /appointment` | Patients manage their own visits; doctors see/complete their own; admin can list all |
+| Prescriptions | `POST /prescription`, `GET /prescription/mine`, `GET /prescription/appointment/{appointmentId}`, `PUT/DELETE /prescription/{id}` | Doctors manage their own; patients read their own; admin may read |
 
 Appointment requests use `{"doctorId": 1, "appointmentTime": "2027-01-15T09:00:00"}`. The server assigns the patient from the authenticated identity, checks the doctor's available slots, rejects past appointments and overlapping bookings, and does not trust a patient ID from the browser.
 
