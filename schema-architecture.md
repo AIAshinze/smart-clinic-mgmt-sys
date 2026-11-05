@@ -21,7 +21,7 @@ The database is named `cms`. The table names and column definitions below follow
 ### `patient`
 
 | Column | MySQL type | Keys and constraints |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `BIGINT` | PK, `NOT NULL`, `AUTO_INCREMENT` |
 | `name` | `VARCHAR(100)` | `NOT NULL` |
 | `email` | `VARCHAR(150)` | `NOT NULL`, `UNIQUE` |
@@ -32,7 +32,7 @@ The database is named `cms`. The table names and column definitions below follow
 ### `doctor`
 
 | Column | MySQL type | Keys and constraints |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `BIGINT` | PK, `NOT NULL`, `AUTO_INCREMENT` |
 | `name` | `VARCHAR(100)` | `NOT NULL` |
 | `email` | `VARCHAR(150)` | `NOT NULL`, `UNIQUE` |
@@ -45,7 +45,7 @@ The database is named `cms`. The table names and column definitions below follow
 JPA models a doctor's availability as an element collection, stored separately so one doctor can have multiple available time slots without repeating doctor profile columns.
 
 | Column | MySQL type | Keys and constraints |
-|---|---|---|
+| --- | --- | --- |
 | `doctor_id` | `BIGINT` | PK component, `NOT NULL`; FK to `doctor.id`, `ON DELETE CASCADE` |
 | `available_times` | `VARCHAR(30)` | PK component, `NOT NULL` |
 
@@ -54,7 +54,7 @@ The composite primary key `(doctor_id, available_times)` prevents duplicate slot
 ### `appointment`
 
 | Column | MySQL type | Keys and constraints |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `BIGINT` | PK, `NOT NULL`, `AUTO_INCREMENT` |
 | `appointment_time` | `DATETIME(6)` | `NOT NULL`; application validation requires a future time |
 | `status` | `INT` | `NOT NULL`, default `0`; check constraint permits `0` (scheduled) or `1` (completed) |
@@ -66,7 +66,7 @@ Indexes on `(doctor_id, appointment_time)` and `(patient_id, appointment_time)` 
 ### `admin`
 
 | Column | MySQL type | Keys and constraints |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `BIGINT` | PK, `NOT NULL`, `AUTO_INCREMENT` |
 | `username` | `VARCHAR(100)` | `NOT NULL`, `UNIQUE` |
 | `password` | `VARCHAR(255)` | `NOT NULL`; stores a BCrypt hash |
@@ -80,7 +80,7 @@ The initial administrator can be bootstrapped from environment configuration; cr
 Spring Data MongoDB maps the `Prescription` model to the `prescriptions` collection. A document stores one prescription and includes the relational `appointmentId` as an application-level reference. MongoDB does not enforce a foreign key to MySQL. The current model fields are:
 
 | Field | BSON type | Constraints / purpose |
-|---|---|---|
+| --- | --- | --- |
 | `_id` | `ObjectId` | MongoDB document identifier, mapped to the Java `String id` |
 | `patientName` | `String` | Required; patient name associated with the prescription |
 | `appointmentId` | `NumberLong` | Required; ID of the associated MySQL appointment |
