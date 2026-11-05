@@ -38,7 +38,7 @@ public class Patient {
 
     @NotBlank
     @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(nullable = false, unique = true)
     private String phone;
 
     @NotBlank

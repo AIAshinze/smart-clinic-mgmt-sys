@@ -50,7 +50,7 @@ public class Doctor {
 
     @NotBlank
     @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false)
     private String phone;
 
     @ElementCollection(fetch = FetchType.EAGER)
