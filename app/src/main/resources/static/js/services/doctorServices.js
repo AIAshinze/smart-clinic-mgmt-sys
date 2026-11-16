@@ -25,16 +25,18 @@ export function getDoctorAvailability(id, date) {
   return apiRequest(`${DOCTOR_API}/${encodeURIComponent(id)}/availability?date=${encodeURIComponent(date)}`);
 }
 
-export function saveDoctor(doctor, token = localStorage.getItem("token")) {
-  return apiRequest(DOCTOR_API, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: jsonBody(doctor)
-  }).then(data => ({ success: true, message: data?.message || "Doctor saved successfully.", data }))
-    .catch(error => {
-      console.error("Unable to save doctor:", error);
-      return { success: false, message: error.message };
+export async function saveDoctor(doctor, token = localStorage.getItem("token")) {
+  try {
+    const data = await apiRequest(DOCTOR_API, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: jsonBody(doctor)
     });
+    return ({ success: true, message: data?.message || "Doctor saved successfully.", data });
+  } catch (error) {
+    console.error("Unable to save doctor:", error);
+    return { success: false, message: error.message };
+  }
 }
 
 export function createDoctor(doctor, token) {
@@ -49,15 +51,17 @@ export function updateDoctor(id, doctor, token) {
   });
 }
 
-export function deleteDoctor(id, token = localStorage.getItem("token")) {
-  return apiRequest(`${DOCTOR_API}/${encodeURIComponent(id)}`, {
-    method: "DELETE",
-    headers: token ? { Authorization: `Bearer ${token}` } : {}
-  }).then(() => ({ success: true, message: "Doctor deleted successfully." }))
-    .catch(error => {
-      console.error("Unable to delete doctor:", error);
-      return { success: false, message: error.message };
+export async function deleteDoctor(id, token = localStorage.getItem("token")) {
+  try {
+    await apiRequest(`${DOCTOR_API}/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
     });
+    return ({ success: true, message: "Doctor deleted successfully." });
+  } catch (error) {
+    console.error("Unable to delete doctor:", error);
+    return { success: false, message: error.message };
+  }
 }
 
 export async function getSpecialties() {
