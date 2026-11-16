@@ -164,46 +164,219 @@ nav a:hover {
 }
 
 
+/* ------------------------------------------------------------------
+ * Modal dialog
+ * .modal         full-screen overlay that isolates the page behind it
+ * .modal-content the white card (built by modals.js if a page lacks it)
+ * Colours fall back to literals because some pages do not load index.css.
+ * ------------------------------------------------------------------ */
 .modal {
   display: none;
   position: fixed;
-  z-index: 999;
-  padding-top: 60px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: rgba(8, 44, 42, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.modal.is-open {
+  display: flex;
+  animation: modal-fade 0.18s ease-out;
+}
+
+/* Stop the page behind the overlay from scrolling. */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Some pages do not load index.css, so do not rely on its global border-box reset. */
+.modal-content,
+.modal-content *,
+.modal-content *::before,
+.modal-content *::after {
+  box-sizing: border-box;
 }
 
 .modal-content {
-  background-color: white;
-  margin: auto;
-  padding: 30px;
-  border-radius: 10px;
-  width: 400px;
   position: relative;
+  width: min(480px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 2rem 1.75rem 1.75rem;
+  border-radius: 14px;
+  background-color: #fff;
+  color: var(--ink, #143b3c);
+  text-align: left;
+  box-shadow: 0 24px 70px rgba(8, 44, 42, 0.35), 0 2px 8px rgba(0, 0, 0, 0.12);
+  animation: modal-pop 0.2s ease-out;
 }
 
-.modal-content h2 {
-  font-size: 32px;
+@supports (height: 100dvh) {
+  .modal-content {
+    max-height: calc(100dvh - 2rem);
+  }
 }
 
 .close {
-  color: #aaa;
   position: absolute;
-  right: 20px;
-  top: 15px;
-  font-size: 28px;
-  font-weight: bold;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: var(--muted, #587071);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.close:hover,
+.close:focus-visible {
+  background-color: #eaf3f1;
+  color: var(--ink, #143b3c);
+  outline: none;
+}
+
+.close:focus-visible {
+  box-shadow: 0 0 0 3px rgba(13, 107, 102, 0.35);
+}
+
+/* Form layout inside the modal */
+.modal-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.modal-form h2 {
+  margin: 0 2rem 0.25rem 0;
+  color: var(--brand-dark, #084d4a);
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.modal-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--muted, #587071);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.modal-form .input-field {
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border, #d7e4e2);
+  border-radius: 8px;
+  background-color: #fff;
+  color: var(--ink, #143b3c);
+  font: inherit;
+  cursor: text;
+}
+
+.modal-form textarea.input-field {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.modal-form .input-field:focus {
+  filter: none;
+  outline: 3px solid rgba(13, 107, 102, 0.3);
+  outline-offset: 0;
+  border-color: var(--brand, #0d6b66);
+  box-shadow: none;
+}
+
+/* Availability checkboxes (Add Doctor) */
+.modal-form fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem 0.75rem;
+  min-width: 0;
+  padding: 0.5rem 1rem 1rem;
+  border: 1px solid var(--border, #d7e4e2);
+  border-radius: 10px;
+}
+
+.modal-form legend {
+  padding: 0 0.4rem;
+  color: var(--muted, #587071);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.modal-form fieldset label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink, #143b3c);
+  font-weight: 500;
   cursor: pointer;
 }
 
-.close:hover {
-  color: black;
+.modal-form input[type="checkbox"] {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--brand, #0d6b66);
+  cursor: pointer;
 }
 
+.modal-form button[type="submit"] {
+  width: 100%;
+  margin-top: 0.25rem;
+}
 
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .modal.is-open,
+  .modal-content {
+    animation: none;
+  }
+}
 
 .dashboard-btn {
   width: 100%;

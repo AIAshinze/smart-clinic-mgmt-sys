@@ -61,6 +61,44 @@ const modalMarkup = {
     </form>`
 };
 
+let lastFocused = null;
+let isolatedElements = [];
+
+/*
+ * Every page ships the same #modal > #modal-body skeleton, but only some wrap it
+ * in a .modal-content card. Build the card here when it is missing so all pages
+ * get the same isolated dialog without editing each HTML file.
+ */
+function ensureModalShell(modal) {
+  let content = modal.querySelector(".modal-content");
+  if (!content) {
+    content = document.createElement("div");
+    content.className = "modal-content";
+    content.append(...modal.children);
+    modal.append(content);
+  }
+  content.setAttribute("role", "dialog");
+  content.setAttribute("aria-modal", "true");
+  return content;
+}
+
+// Make everything behind the modal unreachable by keyboard, screen reader and click.
+function isolateBackground(modal) {
+  restoreBackground();
+  isolatedElements = [...document.body.children].filter(element =>
+    element !== modal && element.tagName !== "SCRIPT" && !element.hasAttribute("inert"));
+  isolatedElements.forEach(element => element.setAttribute("inert", ""));
+}
+
+function restoreBackground() {
+  isolatedElements.forEach(element => element.removeAttribute("inert"));
+  isolatedElements = [];
+}
+
+function closeOnEscape(event) {
+  if (event.key === "Escape") closeModal();
+}
+
 export function openModal(typeOrDialog) {
   if (typeOrDialog instanceof HTMLDialogElement) {
     if (!typeOrDialog.open) typeOrDialog.showModal();
@@ -71,15 +109,42 @@ export function openModal(typeOrDialog) {
   if (!modal || !body || !modalMarkup[typeOrDialog]) {
     throw new TypeError(`Unknown modal: ${typeOrDialog}`);
   }
+  const content = ensureModalShell(modal);
   body.innerHTML = modalMarkup[typeOrDialog];
-  body.querySelectorAll("input, textarea, select").forEach(field => field.classList.add("input-field"));
+  // Checkboxes keep their native look; .input-field would hide them (appearance: none).
+  body.querySelectorAll("input:not([type=checkbox]), textarea, select")
+    .forEach(field => field.classList.add("input-field"));
   body.querySelectorAll("form button").forEach(button => button.classList.add("button", "button-primary"));
-  modal.style.display = "block";
+
+  const title = body.querySelector("h2");
+  if (title) {
+    title.id = "modal-title";
+    content.setAttribute("aria-labelledby", "modal-title");
+  }
+
+  if (!modal.classList.contains("is-open")) lastFocused = document.activeElement;
+  modal.classList.add("is-open");
   modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  isolateBackground(modal);
+  content.scrollTop = 0;
+
   const closeButton = modal.querySelector("#closeModal");
-  if (closeButton) closeButton.onclick = closeModal;
+  if (closeButton) {
+    closeButton.onclick = closeModal;
+    closeButton.onkeydown = event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        closeModal();
+      }
+    };
+  }
   modal.onclick = closeOnBackdrop;
+  document.removeEventListener("keydown", closeOnEscape);
+  document.addEventListener("keydown", closeOnEscape);
+
   attachFormHandler(typeOrDialog, body.querySelector("form"));
+  body.querySelector("input, textarea, select, button")?.focus();
 }
 
 function attachFormHandler(type, form) {
@@ -111,8 +176,13 @@ export function closeModal(dialog) {
   }
   const modal = document.getElementById("modal");
   if (!modal) return;
-  modal.style.display = "none";
+  modal.classList.remove("is-open");
   modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+  document.removeEventListener("keydown", closeOnEscape);
+  restoreBackground();
+  if (lastFocused instanceof HTMLElement && document.contains(lastFocused)) lastFocused.focus();
+  lastFocused = null;
 }
 
 export function showBookingOverlay(event, doctor, patientData) {
