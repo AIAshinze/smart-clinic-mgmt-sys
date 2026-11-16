@@ -1,0 +1,29 @@
+name: Dockerfile Lint
+
+# Lints app/Dockerfile with Hadolint against Dockerfile best practices.
+on:
+    push:
+    pull_request:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: docker-lint-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    hadolint:
+        name: Lint Dockerfile (Hadolint)
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v4
+
+            - name: Run Hadolint
+              uses: hadolint/hadolint-action@v3.1.0
+              with:
+                  dockerfile: app/Dockerfile
+                  # Fail the job on warnings and errors; style/info findings are reported only.
+                  failure-threshold: warning

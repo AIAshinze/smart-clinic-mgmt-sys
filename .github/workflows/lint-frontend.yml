@@ -1,0 +1,55 @@
+name: Frontend Lint
+
+# Lints the HTML, CSS and JavaScript under app/src/main/resources
+# (static pages, Thymeleaf templates, stylesheets and ES modules).
+on:
+    push:
+    pull_request:
+
+permissions:
+    contents: read
+
+# Cancel a still-running lint for the same branch/PR when a newer commit arrives.
+concurrency:
+    group: frontend-lint-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    lint:
+        name: Lint HTML, CSS and JS
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+
+            - name: Install lint tooling
+              run: npm ci
+
+            # Separate steps so one failure does not hide the others' output.
+            - name: Lint HTML (HTMLHint)
+              id: html
+              run: npm run lint:html
+              continue-on-error: true
+
+            - name: Lint CSS (Stylelint)
+              id: css
+              run: npm run lint:css
+              continue-on-error: true
+
+            - name: Lint JavaScript (ESLint)
+              id: js
+              run: npm run lint:js
+              continue-on-error: true
+
+            - name: Fail if any linter reported errors
+              if: steps.html.outcome == 'failure' || steps.css.outcome == 'failure' || steps.js.outcome == 'failure'
+              run: |
+                  echo "HTML: ${{ steps.html.outcome }}  CSS: ${{ steps.css.outcome }}  JS: ${{ steps.js.outcome }}"
+                  exit 1

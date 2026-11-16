@@ -1,0 +1,78 @@
+name: Lint Java Backend
+
+on:
+    push:
+    pull_request:
+
+permissions:
+    contents: read
+
+# Cancel a still-running lint for the same branch/PR when a newer commit arrives.
+concurrency:
+    group: lint-java-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    CHECKSTYLE_VERSION: "10.12.1"
+
+jobs:
+    lint-java:
+        name: Checkstyle Java Linting
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v4
+
+            - name: Set up JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: "17"
+
+            - name: Cache Checkstyle jar
+              id: checkstyle-cache
+              uses: actions/cache@v4
+              with:
+                  path: checkstyle.jar
+                  key: checkstyle-${{ env.CHECKSTYLE_VERSION }}
+
+            - name: Download Checkstyle
+              if: steps.checkstyle-cache.outputs.cache-hit != 'true'
+              run: |
+                  curl -fsSL --retry 3 -o checkstyle.jar \
+                    "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${CHECKSTYLE_VERSION}/checkstyle-${CHECKSTYLE_VERSION}-all.jar"
+
+            # google_checks.xml reports style findings as warnings, so they do not fail
+            # the job. A crash, an unreadable config or an error-level finding does.
+            - name: Run Checkstyle (Google Java Style)
+              run: |
+                  set -o pipefail
+                  java -jar checkstyle.jar -c /google_checks.xml app/src/main/java \
+                    | tee checkstyle-report.txt
+
+            - name: Summarize findings
+              if: always()
+              run: |
+                  [ -f checkstyle-report.txt ] || exit 0
+                  warnings=$(grep -c '^\[WARN\]' checkstyle-report.txt || true)
+                  errors=$(grep -c '^\[ERROR\]' checkstyle-report.txt || true)
+                  {
+                    echo "### Checkstyle (Google Java Style)"
+                    echo
+                    echo "**${errors} errors, ${warnings} warnings** (warnings do not fail the build)"
+                    echo
+                    echo "| Rule | Findings |"
+                    echo "| --- | ---: |"
+                    grep -o '\[[A-Za-z]*\]$' checkstyle-report.txt \
+                      | sort | uniq -c | sort -rn | head -10 \
+                      | awk '{ gsub(/[][]/, "", $2); print "| " $2 " | " $1 " |" }'
+                  } >> "$GITHUB_STEP_SUMMARY"
+
+            - name: Upload full report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: checkstyle-report
+                  path: checkstyle-report.txt
+                  if-no-files-found: ignore
